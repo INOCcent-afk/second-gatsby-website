@@ -1,22 +1,60 @@
 import React from "react"
-import { Link } from "gatsby"
+import Layout from "../components/Layout"
+import { Link, graphql } from "gatsby"
+import Image from "gatsby-image"
+import "./Index.scss"
+import Contact from "../components/ContactUs"
 
-import Layout from "../components/layout"
-import Image from "../components/image"
-import SEO from "../components/seo"
+export const query = graphql`
+  {
+    allContentfulAnimals {
+      nodes {
+        id
+        animalType
+        animalImage {
+          fluid {
+            ...GatsbyContentfulFluid
+          }
+        }
+        animalDescription {
+          animalDescription
+        }
+        slug
+      }
+    }
+  }
+`
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-    <Link to="/page-2/">Go to page 2</Link> <br />
-    <Link to="/using-typescript/">Go to "Using TypeScript"</Link>
-  </Layout>
-)
+const IndexPage = ({ data }) => {
+  const {
+    allContentfulAnimals: { nodes: animals },
+  } = data
+  return (
+    <Layout>
+      <div className="container">
+        {animals.map(animal => {
+          return (
+            <article key={animal.id}>
+              <div className="image-container">
+                <Image
+                  fluid={animal.animalImage.fluid}
+                  alt={animal.animalType}
+                />
+              </div>
+              <div className="animal-redirect">
+                <h1>{animal.animalType}</h1>
+                <p>{animal.animalDescription.animalDescription}</p>
+                <button>
+                  <Link to={`/animal/${animal.slug}`}>more details</Link>
+                </button>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+      <Contact />
+    </Layout>
+  )
+}
 
 export default IndexPage
